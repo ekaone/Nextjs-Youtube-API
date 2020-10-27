@@ -1,7 +1,23 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
 
-export default function Home() {
+const YOUTUBE_URL = "https://www.googleapis.com/youtube/v3/playlistItems";
+
+export async function getServerSideProps() {
+  const res = await fetch(
+    `${YOUTUBE_URL}?part=snippet&playlistId=PL55RiY5tL51rrC3sh8qLiYHqUV3twEYU_&maxResults=20&key=${process.env.YOUTUBE_API_KEY}`
+  );
+  const data = await res.json();
+  return {
+    props: {
+      data
+    }
+  };
+}
+
+export default function Home({ data }) {
+  console.log("data: ", data);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -11,43 +27,40 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Welcome to My{" "}
+          <a
+            href="https://github.com/ekaone/Nextjs-Youtube-API"
+            target="_blank"
+          >
+            Youtube Playlist API
+          </a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <ul className={styles.grid}>
+          {data.items.map(item => {
+            console.log("item: ", item);
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+            const { id, snippet = {} } = item;
+            const { title, thumbnails = {}, resourceId } = snippet;
+            const { medium = {} } = thumbnails;
+            return (
+              <li key={id} className={styles.card}>
+                <a
+                  href={`https://www.youtube.com/watch?v=${resourceId.videoId}`}
+                  target="_blank"
+                >
+                  <p>
+                    <img
+                      width={medium.width}
+                      height={medium.height}
+                      src={medium.url}
+                    />
+                  </p>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
       </main>
 
       <footer className={styles.footer}>
@@ -56,10 +69,10 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
         </a>
       </footer>
     </div>
-  )
+  );
 }
