@@ -1,6 +1,6 @@
 Youtube Playlist API
 
-(End Point)[https://www.googleapis.com/youtube/v3/playlistItems]
+[End Point](https://www.googleapis.com/youtube/v3/playlistItems)
 
 ## Author
 ✔ Eka Prasetia 🤵
